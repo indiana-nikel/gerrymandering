@@ -30,6 +30,7 @@ which_state <- function(mapData, long, lat) {
 
 library(shiny)
 library(tidyverse)
+library(rsconnect)
 
 usa_map <- map_data("state")
 
@@ -37,17 +38,19 @@ usa_map <- map_data("state")
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Maps"),
+  titlePanel("Redistricting through Machine Learning"),
   
   # Sidebar with a slider input for number of bins 
-  sidebarLayout(
-    sidebarPanel(
+  sidebarPanel(
+    selectInput("state_select", "Choose a state:",
+                unique(usa_map$region),
+                selected="washington")
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
-       plotOutput("mapPlot", click="clickMap"),  
+       plotOutput("mapPlot", dblclick="clickMap", click="clickSummary"),  
        plotOutput("zoomPlot")
     )
   )
-))
+)

@@ -59,23 +59,26 @@ zoom_state <- function(mapData, state) {
 
 library(shiny)
 library(tidyverse)
+library(rsconnect)
 
 usa_map <- map_data("state")
+initial <- map_data("state") %>% filter(region=="oregon")
 
 plotMap <- ggplot(usa_map, aes(x = long, y = lat, group = group, fill=region)) + 
   geom_polygon() + 
   guides(fill = FALSE) + 
   theme_classic() + 
   xlab("Latitude") + 
-  ylab("Longitude")
+  ylab("Longitude") + 
+  labs(title="United States of America")
 
-plotZoom <- ggplot(usa_map, aes(x = long, y = lat, group = group, fill=region)) + 
+plotZoomInitial <- ggplot(initial, aes(x = long, y = lat, group = group, fill="black")) + 
   geom_polygon() + 
   guides(fill = FALSE) + 
   theme_classic() + 
   xlab("Latitude") + 
-  ylab("Longitude")
-
+  ylab("Longitude") + 
+  labs(title="Selected State")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -88,13 +91,13 @@ shinyServer(function(input, output) {
   
   output$zoomPlot <- renderPlot({
     
-    plotZoom
+    plotZoomInitial
     
   })
   
-  observeEvent(input$clickMap, {
-    xClick <- input$clickMap$x
-    yClick <- input$clickMap$y
+  observeEvent(input$clickSummary, {
+    xClick <- input$clickSummary$x
+    yClick <- input$clickSummary$y
     state <- which_state(usa_map, xClick, yClick)
     zoom <- zoom_state(usa_map, state)
     
@@ -102,22 +105,25 @@ shinyServer(function(input, output) {
       plotMap +
         geom_polygon(data = usa_map[usa_map$region == state,], color = "black")
     )
+  })
+  
+  observeEvent(input$clickMap, {
+    xClick <- input$clickMap$x
+    yClick <- input$clickMap$y
+    state <- which_state(usa_map, xClick, yClick)
+    zoom <- zoom_state(usa_map, state)
+    data_state <- map_data("state") %>% filter(region==state)
     
-    if (zoom[3] >= zoom[6]) {
-      output$zoomPlot <- renderPlot({
-        plotMap + 
-          geom_polygon(data = usa_map[usa_map$region == state,], color = "black") + 
-          coord_cartesian(xlim = c(zoom[1], zoom[2]), ylim = c(mean(zoom[4], zoom[5]) - zoom[3] / 2 , mean(zoom[4], zoom[5]) + zoom[3] / 2))
+    plotZoom <- ggplot(data_state, aes(x = long, y = lat, group = group, fill="black")) + 
+      geom_polygon() + 
+      guides(fill = FALSE) + 
+      theme_classic() + 
+      xlab("Latitude") + 
+      ylab("Longitude") + 
+      labs(title="Selected State")
+    
+    output$zoomPlot <- renderPlot({
+      plotZoom
       }) 
-      } else {
-          output$zoomPlot <- renderPlot({ 
-            plotMap + 
-              geom_polygon(data = usa_map[usa_map$region == state,], color = "black") + 
-              coord_cartesian(xlim = c(mean(zoom[1], zoom[2]) - zoom[6] / 2, mean(zoom[1], zoom[2]) + zoom[6] / 2), ylim = c(zoom[4], zoom[5]))
-          })
-      }
-    
-        
     })
 })
-
