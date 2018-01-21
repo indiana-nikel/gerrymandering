@@ -33,6 +33,7 @@ library(tidyverse)
 library(rsconnect)
 
 usa_map <- map_data("state")
+summary_tab <- read.csv("state_summary.csv")
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -44,13 +45,16 @@ shinyUI(fluidPage(
   sidebarPanel(
     selectInput("state_select", "Choose a state:",
                 unique(usa_map$region),
-                selected="washington")
+                selected="oregon"),
+    verbatimTextOutput("information"), 
+    plotOutput("plotSummary")
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
-       plotOutput("mapPlot", dblclick="clickMap", click="clickSummary"),  
+       plotOutput("mapPlot", dblclick="clickMap", click="clickSummary", hover ="hoverStats"),
        plotOutput("zoomPlot")
+       
     )
   )
 )

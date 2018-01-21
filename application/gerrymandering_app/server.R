@@ -63,6 +63,7 @@ library(rsconnect)
 
 usa_map <- map_data("state")
 initial <- map_data("state") %>% filter(region=="oregon")
+summary_tab <- read.csv("state_summary.csv")
 
 plotMap <- ggplot(usa_map, aes(x = long, y = lat, group = group, fill=region)) + 
   geom_polygon() + 
@@ -78,7 +79,15 @@ plotZoomInitial <- ggplot(initial, aes(x = long, y = lat, group = group, fill="b
   theme_classic() + 
   xlab("Latitude") + 
   ylab("Longitude") + 
-  labs(title="Selected State")
+  labs(title="oregon")
+
+summary_plot <- ggplot(summary_tab, aes(x = pop)) + 
+  geom_histogram() + 
+  guides(fill = FALSE) + 
+  theme_classic() + 
+  xlab("Population") + 
+  ylab("Frequency") + 
+  labs(title="Summary Plot")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -95,17 +104,53 @@ shinyServer(function(input, output) {
     
   })
   
+  output$plotSummary <- renderPlot({
+    
+    summary_plot <- ggplot(summary_tab, aes(x = pop, y = seats)) + 
+      geom_point() + 
+      guides(fill = FALSE) + 
+      theme_classic() + 
+      xlab("Population") + 
+      ylab("Congressional Seats") + 
+      labs(title="Congressional Seats \n Based on Population")
+    summary_plot
+    
+  })
+  
   observeEvent(input$clickSummary, {
     xClick <- input$clickSummary$x
     yClick <- input$clickSummary$y
     state <- which_state(usa_map, xClick, yClick)
     zoom <- zoom_state(usa_map, state)
     
-    output$mapPlot <- renderPlot(
+    summary_filter <- summary_tab %>% filter(states == state) 
+    
+    output$mapPlot <- renderPlot({
       plotMap +
         geom_polygon(data = usa_map[usa_map$region == state,], color = "black")
-    )
-  })
+      })
+    
+    # output$plotSummary <- renderPlot({
+    #   
+    #   summary_plot <- ggplot(summary_tab, aes(x = pop, y = seats)) + 
+    #     geom_point(data = summary_filter,
+    #                size = 6, shape = 1, color = "red") + 
+    #     guides(fill = FALSE) + 
+    #     theme_classic() + 
+    #     xlab("Population") + 
+    #     ylab("Congressional Seats") + 
+    #     labs(title="Congressional Seats \n Based on Population") + 
+    #     theme_minimal()
+    #   
+    # })
+    
+      output$information <- renderText({
+        paste("State:", summary_filter$states,
+              "\nPopulation:", summary_filter$pop, 
+              "\nCongressional Seats:", summary_filter$seats, 
+              "\nPopulation per Seat:", summary_filter$pop_per_seat)
+      })
+    })
   
   observeEvent(input$clickMap, {
     xClick <- input$clickMap$x
@@ -120,10 +165,23 @@ shinyServer(function(input, output) {
       theme_classic() + 
       xlab("Latitude") + 
       ylab("Longitude") + 
-      labs(title="Selected State")
+      labs(title=state)
     
     output$zoomPlot <- renderPlot({
       plotZoom
       }) 
     })
+  
+  observeEvent(input$hoverStats, {
+    xHover <- input$hoverStats$x
+    yHover <- input$hoverStats$y
+    state <- which_state(usa_map, xHover, yHover)
+    zoom <- zoom_state(usa_map, state)
+    
+    output$mapPlot <- renderPlot(
+      plotMap +
+        geom_polygon(data = usa_map[usa_map$region == state,], color = "black")
+    )
+  })
+  
 })
