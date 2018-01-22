@@ -59,7 +59,7 @@ zoom_state <- function(mapData, state) {
 
 library(shiny)
 library(tidyverse)
-library(rsconnect)
+library(maps)
 
 usa_map <- map_data("state")
 initial <- map_data("state") %>% filter(region=="oregon")
