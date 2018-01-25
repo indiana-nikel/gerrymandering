@@ -72,11 +72,13 @@ library(shiny)
 library(tidyverse)
 library(maps)
 library(shinydashboard)
+library(USAboundaries)
 
 summary_tab <- read.csv("state_summary.csv")
 
 full_map <- left_join(map_data("state"), summary_tab, by=c("region"="states"))
 initial <- full_map  %>% filter(region=="oregon")
+initial_filter <- summary_tab %>% filter(states == "oregon") 
 
 full_county <- left_join(map_data("county"), summary_tab, by=c("region"="states"))
 county_sub <- subset(full_county, region == "oregon")
@@ -199,10 +201,44 @@ shinyServer(function(input, output) {
     
   })
   
-  output$summaryPlot <- renderPlot({
+  output$scatterPlot <- renderPlot({
     
     plotSummaryScatter
     
+  })
+  
+  output$histPlot <- renderPlot({
+    
+    plotSummaryHist
+    
+  })
+  
+  output$stateBox <- renderValueBox({
+    valueBox(
+      paste0(initial_filter$states), "State", icon = icon("flag"),
+      color = "red"
+    )
+  })
+  
+  output$popBox <- renderValueBox({
+    valueBox(
+      paste0(initial_filter$pop), "Population", icon = icon("id-card-o"),
+      color = "yellow"
+    )
+  })
+  
+  output$seatBox <- renderValueBox({
+    valueBox(
+      paste0(initial_filter$seats), "Congressional Seats", icon = icon("institution"),
+      color = "green"
+    )
+  })
+  
+  output$pop_seatBox <- renderValueBox({
+    valueBox(
+      paste0(initial_filter$pop_per_seat), "Population per Seat", icon = icon("male"),
+      color = "blue"
+    )
   })
   
   observeEvent(input$clickSummary, {
@@ -233,12 +269,30 @@ shinyServer(function(input, output) {
     #   
     # })
     
-      output$information <- renderText({
-        paste("State:", summary_filter$states,
-              "\nPopulation:", summary_filter$pop, 
-              "\nCongressional Seats:", summary_filter$seats, 
-              "\nPopulation per Seat:", summary_filter$pop_per_seat)
+    output$stateBox <- renderValueBox({
+      valueBox(
+        paste0(summary_filter$states), "State", icon = icon("list"),
+        color = "red"
+        )
       })
+    output$popBox <- renderValueBox({
+      valueBox(
+        paste0(summary_filter$pop), "Population", icon = icon("list"),
+        color = "yellow"
+      )
+    })
+    output$seatBox <- renderValueBox({
+      valueBox(
+        paste0(summary_filter$seats), "Congressional Seats", icon = icon("list"),
+        color = "green"
+      )
+    })
+    output$pop_seatBox <- renderValueBox({
+      valueBox(
+        paste0(summary_filter$pop_per_seat), "Population per Seat", icon = icon("list"),
+        color = "blue"
+      )
+    })
     })
   
   observeEvent(input$dblclickMap, {
