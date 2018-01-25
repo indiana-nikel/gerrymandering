@@ -1,4 +1,5 @@
 
+# Pulled from http://playshiny.com/
 which_state <- function(mapData, long, lat) {
   # This function decides the state being clicked. 
   #
@@ -57,31 +58,42 @@ zoom_state <- function(mapData, state) {
   
 }
 
+# Pulled from http://eriqande.github.io/rep-res-web/lectures/making-maps-with-R.html
+no_axes <- theme(
+  axis.text = element_blank(),
+  axis.line = element_blank(),
+  axis.ticks = element_blank(),
+  panel.border = element_blank(),
+  panel.grid = element_blank(),
+  axis.title = element_blank()
+)
+
 library(shiny)
 library(tidyverse)
 library(maps)
+library(shinydashboard)
 
-usa_map <- map_data("state")
-initial <- map_data("state") %>% filter(region=="oregon")
 summary_tab <- read.csv("state_summary.csv")
 
-plotMap <- ggplot(usa_map, aes(x = long, y = lat, group = group, fill=region)) + 
-  geom_polygon() + 
-  guides(fill = FALSE) + 
-  theme_classic() + 
-  xlab("Latitude") + 
-  ylab("Longitude") + 
-  labs(title="United States of America")
+full_map <- left_join(map_data("state"), summary_tab, by=c("region"="states"))
+initial <- full_map  %>% filter(region=="oregon")
 
-plotZoomInitial <- ggplot(initial, aes(x = long, y = lat, group = group, fill="black")) + 
-  geom_polygon() + 
+full_county <- left_join(map_data("county"), summary_tab, by=c("region"="states"))
+county_sub <- subset(full_county, region == "oregon")
+
+plotZoomInitial <- ggplot(initial, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(fill="grey", color="black") + 
+  geom_polygon(data = county_sub, fill = NA, color = "white") +
+  geom_polygon(color = "black", fill = NA) + 
+  coord_fixed(1.3) +
   guides(fill = FALSE) + 
-  theme_classic() + 
+  theme_classic() +
+  no_axes + 
   xlab("Latitude") + 
   ylab("Longitude") + 
   labs(title="oregon")
 
-summary_plot <- ggplot(summary_tab, aes(x = pop)) + 
+plotSummaryHist <- ggplot(summary_tab, aes(x = pop)) + 
   geom_histogram() + 
   guides(fill = FALSE) + 
   theme_classic() + 
@@ -89,12 +101,95 @@ summary_plot <- ggplot(summary_tab, aes(x = pop)) +
   ylab("Frequency") + 
   labs(title="Summary Plot")
 
+plotSummaryScatter <- ggplot(summary_tab, aes(x = pop, y = seats)) + 
+  geom_point() + 
+  guides(fill = FALSE) + 
+  theme_classic() + 
+  xlab("Population") + 
+  ylab("Congressional Seats") + 
+  labs(title="Congressional Seats \n Based on Population")
+
+plotter <- function(section) {
+  if (section == "west"){ 
+    sub_map <- full_map %>% filter(section=="west")
+    
+    plotMap <- ggplot(sub_map, aes(x = long, y = lat, group = group, fill=region)) + 
+      geom_polygon(color="white") + 
+      coord_fixed(1.3) + 
+      guides(fill = FALSE) + 
+      theme_classic() +
+      no_axes + 
+      xlab("Latitude") + 
+      ylab("Longitude") + 
+      labs(title="United States of America\nWest")
+  } else if (section == "southwest"){ 
+    sub_map <- full_map %>% filter(section=="southwest")
+    
+    plotMap <- ggplot(sub_map, aes(x = long, y = lat, group = group, fill=region)) + 
+      geom_polygon(color="white") + 
+      coord_fixed(1.3) + 
+      guides(fill = FALSE) + 
+      theme_classic() +
+      no_axes + 
+      xlab("Latitude") + 
+      ylab("Longitude") + 
+      labs(title="United States of America\nSouthwest")
+  } else if (section == "midwest"){ 
+    sub_map <- full_map %>% filter(section=="midwest")
+    
+    plotMap <- ggplot(sub_map, aes(x = long, y = lat, group = group, fill=region)) + 
+      geom_polygon(color="white") + 
+      coord_fixed(1.3) + 
+      guides(fill = FALSE) + 
+      theme_classic() +
+      no_axes + 
+      xlab("Latitude") + 
+      ylab("Longitude") + 
+      labs(title="United States of America\nMidwest")
+  } else if (section == "northeast"){ 
+    sub_map <- full_map %>% filter(section=="northeast")
+    
+    plotMap <- ggplot(sub_map, aes(x = long, y = lat, group = group, fill=region)) + 
+      geom_polygon(color="white") + 
+      coord_fixed(1.3) + 
+      guides(fill = FALSE) + 
+      theme_classic() +
+      no_axes + 
+      xlab("Latitude") + 
+      ylab("Longitude") + 
+      labs(title="United States of America\nNortheast")
+  } else if (section == "southeast"){ 
+    sub_map <- full_map %>% filter(section=="southeast")
+    
+    plotMap <- ggplot(sub_map, aes(x = long, y = lat, group = group, fill=region)) + 
+      geom_polygon(color="white") + 
+      coord_fixed(1.3) + 
+      guides(fill = FALSE) + 
+      theme_classic() +
+      no_axes + 
+      xlab("Latitude") + 
+      ylab("Longitude") + 
+      labs(title="United States of America\nSoutheast")
+  } else {
+    plotMap <- ggplot(full_map, aes(x = long, y = lat, group = group, fill=region)) + 
+      geom_polygon(color="white") + 
+      coord_fixed(1.3) + 
+      guides(fill = FALSE) + 
+      theme_classic() +
+      no_axes + 
+      xlab("Latitude") + 
+      ylab("Longitude") + 
+      labs(title="United States of America")
+  }
+  return(plotMap)
+}
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
    
   output$mapPlot <- renderPlot({
     
-    plotMap
+    plotter(input$section_select)
     
   })
   
@@ -104,30 +199,24 @@ shinyServer(function(input, output) {
     
   })
   
-  output$plotSummary <- renderPlot({
+  output$summaryPlot <- renderPlot({
     
-    summary_plot <- ggplot(summary_tab, aes(x = pop, y = seats)) + 
-      geom_point() + 
-      guides(fill = FALSE) + 
-      theme_classic() + 
-      xlab("Population") + 
-      ylab("Congressional Seats") + 
-      labs(title="Congressional Seats \n Based on Population")
-    summary_plot
+    plotSummaryScatter
     
   })
   
   observeEvent(input$clickSummary, {
     xClick <- input$clickSummary$x
     yClick <- input$clickSummary$y
-    state <- which_state(usa_map, xClick, yClick)
-    zoom <- zoom_state(usa_map, state)
+    state <- which_state(full_map, xClick, yClick)
+    zoom <- zoom_state(full_map, state)
     
     summary_filter <- summary_tab %>% filter(states == state) 
     
     output$mapPlot <- renderPlot({
-      plotMap +
-        geom_polygon(data = usa_map[usa_map$region == state,], color = "black")
+      sub_map <- full_map %>% filter(section==input$section_select)
+      plotter(input$section_select) +
+        geom_polygon(data = sub_map[sub_map$region == state,], color = "black", size = 1)
       })
     
     # output$plotSummary <- renderPlot({
@@ -152,36 +241,50 @@ shinyServer(function(input, output) {
       })
     })
   
-  observeEvent(input$clickMap, {
-    xClick <- input$clickMap$x
-    yClick <- input$clickMap$y
-    state <- which_state(usa_map, xClick, yClick)
-    zoom <- zoom_state(usa_map, state)
-    data_state <- map_data("state") %>% filter(region==state)
+  observeEvent(input$dblclickMap, {
+    xClick <- input$dblclickMap$x
+    yClick <- input$dblclickMap$y
+    state <- which_state(full_map, xClick, yClick)
+    zoom <- zoom_state(full_map, state)
+    state_zoom <- full_map %>% filter(region==state)
+    county_sub <- subset(full_county, region==state)
     
-    plotZoom <- ggplot(data_state, aes(x = long, y = lat, group = group, fill="black")) + 
-      geom_polygon() + 
+    plotZoom <- ggplot(state_zoom, aes(x = long, y = lat, group = group)) + 
+      geom_polygon(fill="grey", color="black") + 
+      geom_polygon(data = county_sub, fill = NA, color = "white") +
+      geom_polygon(color = "black", fill = NA) + 
+      coord_fixed(1.3) + 
       guides(fill = FALSE) + 
-      theme_classic() + 
+      theme_classic() +
+      no_axes + 
       xlab("Latitude") + 
       ylab("Longitude") + 
       labs(title=state)
     
     output$zoomPlot <- renderPlot({
+      
       plotZoom
+      
       }) 
     })
   
   observeEvent(input$hoverStats, {
     xHover <- input$hoverStats$x
     yHover <- input$hoverStats$y
-    state <- which_state(usa_map, xHover, yHover)
-    zoom <- zoom_state(usa_map, state)
+    state <- which_state(full_map, xHover, yHover)
+    zoom <- zoom_state(full_map, state)
     
-    output$mapPlot <- renderPlot(
-      plotMap +
-        geom_polygon(data = usa_map[usa_map$region == state,], color = "black")
-    )
+    output$mapPlot <- renderPlot({
+      
+      if (input$section_select == "none"){ 
+        plotter(input$section_select) +
+          geom_polygon(data = full_map[full_map$region == state,], color = "black", size = 1)
+      } else { 
+        sub_map <- full_map %>% filter(section==input$section_select)
+        plotter(input$section_select) +
+          geom_polygon(data = sub_map[sub_map$region == state,], color = "black", size = 1)
+      }
+    })
   })
   
 })

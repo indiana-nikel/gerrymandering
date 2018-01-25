@@ -2,6 +2,7 @@
 library(shiny)
 library(tidyverse)
 library(maps)
+library(shinydashboard)
 
 usa_map <- map_data("state")
 summary_tab <- read.csv("state_summary.csv")
@@ -14,16 +15,21 @@ shinyUI(fluidPage(
   
   # Sidebar with a slider input for number of bins 
   sidebarPanel(
-    selectInput("state_select", "Choose a state:",
-                unique(usa_map$region),
-                selected="oregon"),
+    selectInput("section_select", "Choose a region:",
+                c("West" = "west",
+                  "Southwest" = "southwest",
+                  "Midwest" = "midwest",
+                  "Northeast" = "northeast",
+                  "Southeast" = "southeast",
+                  "None selected" = "none"),
+                selected = "none"),
     verbatimTextOutput("information"), 
-    plotOutput("plotSummary")
+    plotOutput("summaryPlot")
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
-       plotOutput("mapPlot", dblclick="clickMap", click="clickSummary", hover ="hoverStats"),
+       plotOutput("mapPlot", dblclick="dblclickMap", click="clickSummary", hover ="hoverStats"),
        plotOutput("zoomPlot")
        
     )

@@ -1,51 +1,52 @@
-states,pop,seats,pop_per_seat
-california,37254503,53,702905
-texas,25146105,36,698487
-new york,19378087,27,717707
-florida,18804623,27,696345
-illinois,12831549,18,712813
-pennsylvania,12702887,18,705688
-ohio,11536725,16,721032
-michigan,9884129,14,705974
-georgia,9688681,14,691975
-north carolina,9535692,13,733498
-new jersy,8791936,12,732658
-virginia,8001045,11,727366
-washington,6724543,10,672454
-massachusetts,6547817,9,727514
-indiana,6484229,9,720422
-arizona,6392307,9,710224
-tennessee,6346275,9,705123
-missouri,5988927,8,748615
-maryland,5773785,8,721694
-wisconsin,5687289,8,710873
-minnesota,5303925,8,662991
-colorado,5029324,7,720704
-alabama,4780127,7,682819
-south carolina,4625401,7,660766
-louisiana,4533479,6,755562
-kentucky,4339349,6,723228
-oregon,3831073,5,766215
-oklahoma,3751616,5,750270
-connecticut,3574118,5,714819
-iowa,3046869,4,761589
-mississippi,2968103,4,741824
-arkansas,2915958,4,728980
-kansas,2853132,4,713280
-utah,2763888,4,690221
-nevada,2700691,4,675110
-new mexico,2059192,3,686393
-west virginia,1853011,3,617665
-nebraska,1826341,3,608780
-idaho,1567652,2,783791
-hawaii,1360301,2,680151
-maine,1328361,2,664181
-new hampshire,1316466,2,658235
-rhode island,1052931,2,526284
-montana,989417,1,989415
-delaware,897936,1,897934
-south dakota,814191,1,814180
-alaska,710249,1,710231
-north dakota,672591,1,672591
-vermont,625745,1,625741
-wyoming,563767,1,563626
+states,pop,seats,pop_per_seat,section
+california,37254503,53,702905,west
+texas,25146105,36,698487,southwest
+new york,19378087,27,717707,northeast
+florida,18804623,27,696345,southeast
+illinois,12831549,18,712813,midwest
+pennsylvania,12702887,18,705688,northeast
+ohio,11536725,16,721032,midwest
+michigan,9884129,14,705974,midwest
+georgia,9688681,14,691975,southeast
+north carolina,9535692,13,733498,southeast
+new jersey,8791936,12,732658,northeast
+virginia,8001045,11,727366,southeast
+washington,6724543,10,672454,west
+massachusetts,6547817,9,727514,northeast
+indiana,6484229,9,720422,midwest
+arizona,6392307,9,710224,southwest
+tennessee,6346275,9,705123,southeast
+missouri,5988927,8,748615,midwest
+maryland,5773785,8,721694,northeast
+wisconsin,5687289,8,710873,midwest
+minnesota,5303925,8,662991,midwest
+colorado,5029324,7,720704,west
+alabama,4780127,7,682819,southeast
+south carolina,4625401,7,660766,southeast
+louisiana,4533479,6,755562,southeast
+kentucky,4339349,6,723228,southeast
+oregon,3831073,5,766215,west
+oklahoma,3751616,5,750270,southwest
+connecticut,3574118,5,714819,northeast
+iowa,3046869,4,761589,midwest
+mississippi,2968103,4,741824,southeast
+arkansas,2915958,4,728980,southeast
+kansas,2853132,4,713280,midwest
+utah,2763888,4,690221,west
+nevada,2700691,4,675110,west
+new mexico,2059192,3,686393,southwest
+west virginia,1853011,3,617665,southeast
+nebraska,1826341,3,608780,midwest
+idaho,1567652,2,783791,west
+hawaii,1360301,2,680151,non-contiguous
+maine,1328361,2,664181,northeast
+new hampshire,1316466,2,658235,northeast
+rhode island,1052931,2,526284,northeast
+montana,989417,1,989415,west
+delaware,897936,1,897934,northeast
+south dakota,814191,1,814180,midwest
+alaska,710249,1,710231,non-contiguous
+district of columbia,681170,0,681170,northeast
+north dakota,672591,1,672591,midwest
+vermont,625745,1,625741,northeast
+wyoming,563767,1,563626,west
