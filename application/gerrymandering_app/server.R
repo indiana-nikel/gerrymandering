@@ -190,32 +190,25 @@ plotter <- function(section) {
 shinyServer(function(input, output) {
    
   output$mapPlot <- renderPlot({
-    
-    plotter(input$section_select)
-    
+    plotter(input$section_select) + 
+      geom_polygon(data = full_map[full_map$region == "oregon",], color = "black", size = 1)
   })
   
   output$zoomPlot <- renderPlot({
-    
     plotZoomInitial
-    
   })
   
   output$scatterPlot <- renderPlot({
-    
     plotSummaryScatter
-    
   })
   
   output$histPlot <- renderPlot({
-    
     plotSummaryHist
-    
   })
   
   output$stateBox <- renderValueBox({
     valueBox(
-      paste0(initial_filter$states), "State", icon = icon("flag"),
+      paste0(capitalize(initial_filter$states)), "State", icon = icon("flag"),
       color = "red"
     )
   })
@@ -241,37 +234,32 @@ shinyServer(function(input, output) {
     )
   })
   
-  observeEvent(input$clickSummary, {
-    xClick <- input$clickSummary$x
-    yClick <- input$clickSummary$y
+  observeEvent(input$clickMap, {
+    xClick <- input$clickMap$x
+    yClick <- input$clickMap$y
     state <- which_state(full_map, xClick, yClick)
     zoom <- zoom_state(full_map, state)
+    state_zoom <- full_map %>% filter(region==state)
+    county_sub <- subset(full_county, region==state)
     
     summary_filter <- summary_tab %>% filter(states == state) 
     
     output$mapPlot <- renderPlot({
-      sub_map <- full_map %>% filter(section==input$section_select)
-      plotter(input$section_select) +
-        geom_polygon(data = sub_map[sub_map$region == state,], color = "black", size = 1)
-      })
+          if (input$section_select == "all"){
+            plotter(input$section_select) +
+              geom_polygon(data = full_map[full_map$region == state,], color = "black", size = 1)
+          } else {
+            sub_map <- full_map %>% filter(section==input$section_select)
+            plotter(input$section_select) +
+              geom_polygon(data = sub_map[sub_map$region == state,], color = "black", size = 1)
+          }
+        })
     
-    # output$plotSummary <- renderPlot({
-    #   
-    #   summary_plot <- ggplot(summary_tab, aes(x = pop, y = seats)) + 
-    #     geom_point(data = summary_filter,
-    #                size = 6, shape = 1, color = "red") + 
-    #     guides(fill = FALSE) + 
-    #     theme_classic() + 
-    #     xlab("Population") + 
-    #     ylab("Congressional Seats") + 
-    #     labs(title="Congressional Seats \n Based on Population") + 
-    #     theme_minimal()
-    #   
-    # })
+    
     
     output$stateBox <- renderValueBox({
       valueBox(
-        paste0(summary_filter$states), "State", icon = icon("list"),
+        paste0(capitalize(summary_filter$states)), "State", icon = icon("list"),
         color = "red"
         )
       })
@@ -302,43 +290,23 @@ shinyServer(function(input, output) {
     zoom <- zoom_state(full_map, state)
     state_zoom <- full_map %>% filter(region==state)
     county_sub <- subset(full_county, region==state)
-    
-    plotZoom <- ggplot(state_zoom, aes(x = long, y = lat, group = group)) + 
-      geom_polygon(fill="grey", color="black") + 
+
+    plotZoom <- ggplot(state_zoom, aes(x = long, y = lat, group = group)) +
+      geom_polygon(fill="grey", color="black") +
       geom_polygon(data = county_sub, fill = NA, color = "white") +
-      geom_polygon(color = "black", fill = NA) + 
-      coord_fixed(1.3) + 
-      guides(fill = FALSE) + 
+      geom_polygon(color = "black", fill = NA) +
+      coord_fixed(1.3) +
+      guides(fill = FALSE) +
       theme_classic() +
-      no_axes + 
-      xlab("Latitude") + 
-      ylab("Longitude") + 
+      no_axes +
+      xlab("Latitude") +
+      ylab("Longitude") +
       labs(title=state)
-    
+
     output$zoomPlot <- renderPlot({
-      
+
       plotZoom
-      
-      }) 
+
+      })
     })
-  
-  observeEvent(input$hoverStats, {
-    xHover <- input$hoverStats$x
-    yHover <- input$hoverStats$y
-    state <- which_state(full_map, xHover, yHover)
-    zoom <- zoom_state(full_map, state)
-    
-    output$mapPlot <- renderPlot({
-      
-      if (input$section_select == "none"){ 
-        plotter(input$section_select) +
-          geom_polygon(data = full_map[full_map$region == state,], color = "black", size = 1)
-      } else { 
-        sub_map <- full_map %>% filter(section==input$section_select)
-        plotter(input$section_select) +
-          geom_polygon(data = sub_map[sub_map$region == state,], color = "black", size = 1)
-      }
-    })
-  })
-  
 })

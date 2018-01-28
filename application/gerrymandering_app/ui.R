@@ -10,27 +10,37 @@ dashboardPage(
   dashboardHeader(title="Redistricting through Machine Learning", titleWidth = 450),
 
   dashboardSidebar(
-    selectInput("section_select", "Choose a region:",
+    radioButtons("section_select", "Choose a region:",
                 c("West" = "west",
                   "Southwest" = "southwest",
                   "Midwest" = "midwest",
                   "Northeast" = "northeast",
                   "Southeast" = "southeast",
-                  "None" = "none"),
-                selected = "none")
+                  "All" = "all"),
+                selected = "all")
     ),
     
   dashboardBody(
     fluidRow(
-      box(
-        title="Interactive Map", width=6, solidHeader = TRUE,
-        plotOutput("mapPlot", dblclick="dblclickMap", click="clickSummary", hover ="hoverStats")
-        ),
-      box(
-        title="Zoomed-In Map", witdth=6, solidHeader = TRUE,
-        plotOutput("zoomPlot")
+      tabBox(
+        title="Interactive Map", width=12,
+        tabPanel("Select a state",
+          plotOutput("mapPlot", 
+                     click="clickMap",
+                     dblclick="dblclickMap"
+                     )
+            ),
+        tabPanel("See your state",
+          plotOutput("zoomPlot")
+        )
       )
     ),
+    # fluidRow(
+    #   valueBoxOutput("stateBox"),
+    #   valueBoxOutput("popBox"),
+    #   valueBoxOutput("seatBox"),
+    #   valueBoxOutput("pop_seatBox")
+    # ),
     fluidRow(
       column(width=4,
         box(
@@ -38,7 +48,7 @@ dashboardPage(
           plotOutput("scatterPlot")
         )
       ),
-      column(width=4, 
+      column(width=3, 
         valueBoxOutput("stateBox", width=NULL),
         valueBoxOutput("popBox", width=NULL),
         valueBoxOutput("seatBox", width=NULL),
