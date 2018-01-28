@@ -52,7 +52,7 @@ dashboardPage(
           plotOutput("zoomPlot")
         ),
         tabPanel("See your new districts",
-          imageOutput("zoomImage")
+          img(src='nc_kmeans.jpg', align="center")
         )
       )
     ),
@@ -63,16 +63,22 @@ dashboardPage(
       valueBoxOutput("pop_seatBox", width=3)
     ),
     fluidRow(
-      column(width=6,
+      column(width=4,
         box(
-          title="Scatter Plot", width=NULL, solidHeader = TRUE,
-          plotOutput("scatterPlot")
+          title="Bar Plot", width=NULL, solidHeader = TRUE,
+          plotOutput("barPlot")
         )
       ),
-      column(width=6, 
+      column(width=4, 
         box(
           title="Histogram", width=NULL, solidHeader = TRUE,
           plotOutput("histPlot")
+        )
+      ),
+      column(width=4,
+        box(
+          title="Scatter Plot", width=NULL, solidHeader = TRUE,
+          plotOutput("scatterPlot")
         )
       )
     )

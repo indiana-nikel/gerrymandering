@@ -104,13 +104,21 @@ plotSummaryHist <- ggplot(summary_tab, aes(x = pop)) +
   ylab("Frequency") + 
   labs(title="Summary Plot")
 
-plotSummaryScatter <- ggplot(summary_tab, aes(x = pop, y = seats)) + 
+plotSummaryBar <- ggplot(summary_tab, aes(x = section, y=seats, fill=section)) + 
+  geom_bar(stat="sum") + 
+  guides(fill = FALSE) + 
+  theme_classic() + 
+  xlab("Section") + 
+  ylab("Congressional Seats") + 
+  labs(title="Congressional Seats \n Based on Section")
+
+plotSummaryScatter <- ggplot(summary_tab, aes(x = land_area, y = seats)) + 
   geom_point() + 
   guides(fill = FALSE) + 
   theme_classic() + 
-  xlab("Population") + 
+  xlab("Land Area") + 
   ylab("Congressional Seats") + 
-  labs(title="Congressional Seats \n Based on Population")
+  labs(title="Congressional Seats \n Based on Land Area")
 
 plotter <- function(section) {
   if (section == "west"){ 
@@ -199,12 +207,16 @@ shinyServer(function(input, output) {
     plotZoomInitial
   })
   
-  output$scatterPlot <- renderPlot({
-    plotSummaryScatter
+  output$barPlot <- renderPlot({
+    plotSummaryBar
   })
   
   output$histPlot <- renderPlot({
     plotSummaryHist
+  })
+  
+  output$scatterPlot <- renderPlot({
+    plotSummaryScatter
   })
   
   output$stateBox <- renderValueBox({
