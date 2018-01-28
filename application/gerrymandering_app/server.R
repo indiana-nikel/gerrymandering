@@ -73,6 +73,7 @@ library(tidyverse)
 library(maps)
 library(shinydashboard)
 library(USAboundaries)
+library(Hmisc)
 
 summary_tab <- read.csv("state_summary.csv")
 
@@ -208,7 +209,7 @@ shinyServer(function(input, output) {
   
   output$stateBox <- renderValueBox({
     valueBox(
-      paste0(capitalize(initial_filter$states)), "State", icon = icon("flag"),
+      paste0(capitalize(toString(initial_filter$states))), "State", icon = icon("flag"),
       color = "red"
     )
   })
@@ -259,7 +260,7 @@ shinyServer(function(input, output) {
     
     output$stateBox <- renderValueBox({
       valueBox(
-        paste0(capitalize(summary_filter$states)), "State", icon = icon("list"),
+        paste0(capitalize(toString(summary_filter$states))), "State", icon = icon("list"),
         color = "red"
         )
       })
