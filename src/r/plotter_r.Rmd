@@ -13,8 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(maps)
+library(RColorBrewer)
 
-df <- read.csv("nc.csv")
+df <- read.csv("../../usa/ar/clustered.csv")
 
 ```
 
@@ -33,8 +34,8 @@ no_axes <- theme(
 
 states_df <- map_data("state")
 county_df <- map_data("county")
-states_sub <- states_df %>% filter(region=="north carolina")
-county_sub <- subset(county_df, region == "north carolina")
+states_sub <- states_df %>% filter(region=="arkansas")
+county_sub <- subset(county_df, region == "arkansas")
 
 plotState <- ggplot() + 
   geom_polygon(data=states_sub, 
@@ -50,7 +51,7 @@ plotState <- ggplot() +
   no_axes + 
   xlab("Latitude") + 
   ylab("Longitude") + 
-  labs(title="North Carolina")
+  labs(title="Arkansas")
 
 plotKMeans <- ggplot() + 
   geom_point(data=df, aes(x=lon, y=lat, color=label)) +
@@ -67,7 +68,7 @@ plotKMeans <- ggplot() +
   no_axes + 
   xlab("Latitude") + 
   ylab("Longitude") + 
-  labs(title="North Carolina")
+  labs(title="Arkansas")
 
 ```
 
@@ -75,6 +76,6 @@ plotKMeans <- ggplot() +
 
 # Save plot as a .png
 
-ggsave("nc_kmeans.png", plot=plotKMeans)
+ggsave("../../img/ar_clustered.png", plot=plotKMeans)
           
 ```
