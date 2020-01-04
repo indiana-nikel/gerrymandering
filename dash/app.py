@@ -11,9 +11,9 @@ import pandas as pd
 import plotly.express as px
 
 # Initialize app
-# external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
-# app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-app = dash.Dash()
+external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+# app = dash.Dash()
 
 # Load external datasets
 df_states_info = pd.read_csv("dash/state_summary.csv").sort_values(["state_name"])
@@ -55,17 +55,30 @@ app.layout = html.Div([
                 even populations.
             '''
         ),
+        html.H6(
+            children='''
+                NOTE: North Carolina is the only state currently fitted with the Equal-Sized K-Means algorithm.
+            '''
+        ),
     ]),
     html.Div([
+        dcc.Dropdown(
+            id="state-dropdown",
+            options=dropdown_dict,
+            value="nc",
+        ),
+    ], style={'width': '20%', 'display': 'inline-block'}),
+    html.Div([
         html.Div([
-            dcc.Dropdown(
-                id="state-dropdown",
-                options=dropdown_dict,
-                value="nc",
+            html.H5(
+                children="Current Congressional Districts"
             ),
             html.Img(id="original-district"),
+            html.H5(
+                children="Equal-Sized K-Means Districts"
+            ),
             html.Img(id="kmeans-district"),
-        ], style={'width': '49%', 'display': 'inline-block', 'vertical-align': 'middle'}),
+        ], style={'width': '24%', 'display': 'inline-block'}),
         html.Div([
             dcc.Graph(
                 id="choropleth",
@@ -82,13 +95,26 @@ app.layout = html.Div([
                     title="Number of Congressional Seats by State",
                     labels={
                         "state_abbrev":"State Abbreviation",
-                        # "state_name":"State Name",
                         "seats":"Congressional Seats",
                     },
                     template="plotly_white",
                 )
-            )
-        ], style={'width': '49%', 'display': 'inline-block', 'vertical-align': 'middle'})
+            ),
+            # dcc.Graph(
+            #     id="histogram",
+            #     figure=px.histogram(
+            #         df_states_info,
+            #         x="pop_per_seat",
+            #         nbins=20,
+            #         title="Population Distribution of Congressional Districts",
+            #         labels={
+            #             "pop_per_seat":"Population per Congressional District",
+            #             "count":"Number of States",
+            #         },
+            #         template="plotly_white",
+            #     )
+            # )
+        ], style={'width': '74%', 'display': 'inline-block'})
     ])
 ])
 
@@ -96,36 +122,26 @@ app.layout = html.Div([
     dash.dependencies.Output("original-district", "src"),
     [dash.dependencies.Input("state-dropdown", "value")])
 def update_original_district(value):
-    filename = value + "_cd.png"
+    try:
+        filename = value + "_cd.png"
+    except TypeError:
+        filename = "cd.png"
     return app.get_asset_url(filename)
 
 @app.callback(
     dash.dependencies.Output("kmeans-district", "src"),
     [dash.dependencies.Input("state-dropdown", "value")])
 def update_original_district(value):
-    filename = value + "_fit.png"
+    try:
+        filename = value + "_fit.png"
+    except TypeError:
+        filename = "fit.png"
     return app.get_asset_url(filename)
 
-app.css.append_css({
-    "external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"
-})
-
-# dcc.Graph(
-#     id="histogram",
-#     figure=px.histogram(
-#         df_states_info,
-#         x="pop_per_seat",
-#         nbins=20,
-#         title="Population Distribution of Congressional Districts",
-#         labels={
-#             "pop_per_seat":"Population per Congressional District",
-#             "count":"Number of States",
-#         },
-#         template="plotly_white",
-#         width=600,
-#     )
-# )
+# app.css.append_css({
+#     "external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"
+# })
 
 # Run app
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

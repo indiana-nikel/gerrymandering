@@ -6,6 +6,8 @@
 
 Gerrymandering is a fundamental problem that arises when states and provinces need to redistrict due to population fluctuations. I tackle this problem by drawing districts using an equal-sized K-means clustering algorithm and 260 million addresses, pulled from [https://openaddresses.io/](https://openaddresses.io/).
 
+![](img/demo.png)
+
 ## Description
 
 There are 435 members of the House of Representatives in the United States Congress. Each member is elected by a population represented by equivalent portion of the population of the United States, split by 50 states. These clusters of the population are bounded by the border of the state that they are in.
@@ -48,5 +50,3 @@ python dash/app.py
 ```
 
 If your browser doesn't automatically open the application, you'll need to navigate to the port that your terminal directs you to (the port the opens for my machine is: http://127.0.0.1:8050/).
-
-The RShiny application can be found hosted on [shinyapps.io](shinyapps.io). The direct link that launches the application is here: [https://indiana-nikel.shinyapps.io/gerrymandering_app/](https://indiana-nikel.shinyapps.io/gerrymandering_app/).
