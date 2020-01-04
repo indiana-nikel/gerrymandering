@@ -13,7 +13,7 @@ external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 # Load external datasets
-df_states_info = pd.read_csv("state_summary.csv")
+df_states_info = pd.read_csv("dash/state_summary.csv")
 
 # Define app layout
 app.layout = html.Div([

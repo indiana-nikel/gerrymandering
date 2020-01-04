@@ -31,6 +31,7 @@ matplotlib
 plotly
 plotly.express
 dash
+dash_bootstrap_components
 scikit-learn==0.19.2
 geopandas
 geovoronoi[plotting]
@@ -46,6 +47,6 @@ The `dash` application can be run locally by running the following command in yo
 python dash/app.py
 ```
 
-If your browser doesn't automatically open the application, you'll need to navigate to the port that your terminal directs you to (the port the opens for my machine is: ).
+If your browser doesn't automatically open the application, you'll need to navigate to the port that your terminal directs you to (the port the opens for my machine is: http://127.0.0.1:8050/).
 
 The RShiny application can be found hosted on [shinyapps.io](shinyapps.io). The direct link that launches the application is here: [https://indiana-nikel.shinyapps.io/gerrymandering_app/](https://indiana-nikel.shinyapps.io/gerrymandering_app/).
